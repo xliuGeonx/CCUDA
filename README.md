@@ -1,2 +1,2 @@
-# CCUDA
-Cmake version of C++ and CUDA mix programming with boost
+# occa_gpu_algorithm
+typical CUDA gpu algorithm implemented by OCCA
