@@ -104,6 +104,7 @@ LINK_DIRECTORIES(${CUDA_SAMPLE_LIB_DIR})
 #-----------
 
 LIST (APPEND Tests_dir Culib SimpleKernel DeviceQ OpenGL_test0)
-FOREACH (T_dir ${Tests_dir})
+LIST (APPEND Mp_dir MultiProcess MultiProcess_Sample MultiProcess_Asio)
+FOREACH (T_dir ${Tests_dir} ${Mp_dir})
 	ADD_SUBDIRECTORY( ${T_dir})
 ENDFOREACH()
