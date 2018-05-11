@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "H5Cpp.h"
+#include "hdf5.h"
 using namespace H5;
 using namespace std;
 namespace bf = boost::filesystem;
@@ -19,7 +20,8 @@ extern "C" herr_t file_info(hid_t loc_id, const char *name, const H5L_info_t *li
 int main(void)  
 {  
   bf::path pdir("results");
-  bf::create_directory(pdir);
+  if (!bf::exists(pdir))
+    bf::create_directory(pdir);
 
   hsize_t  dims[2];
   hsize_t  cdims[2];
@@ -36,6 +38,24 @@ int main(void)
      * Create a group in the file
      */
     Group* group = new Group( file->createGroup( "/Data" ));
+
+    //creat attributes
+    hsize_t  dimsA[2] = {2, 3};
+    DataSpace dataspaceA(2, dimsA);
+    //IntType int_type(PredType::NATIVE_INT);
+    Attribute attr = group->createAttribute("bb", PredType::NATIVE_INT, dataspaceA);
+    int dd[2][3] = {0,1,2,3,4,5};
+    attr.write(PredType::NATIVE_INT, dd);
+
+    StrType* str_type = new StrType(PredType::C_S1, H5T_VARIABLE);
+    DataSpace* ds_str = new DataSpace(H5S_SCALAR);
+    Attribute* attr_str = new Attribute(group->createAttribute("str", *str_type, *ds_str));
+    attr_str->write(*str_type, string("wtfAudoing!!!!!!"));
+    
+    delete ds_str;
+    ds_str = NULL;
+    delete attr_str;
+    attr_str = NULL;
     /*
      * Create dataset "Compressed Data" in the group using absolute
      * name. Dataset creation property list is modified to use
@@ -76,15 +96,9 @@ int main(void)
     /*
      * Now reopen the file and group in the file.
      */
-    file = new H5File(FILE_NAME, H5F_ACC_RDWR);    
+    file = new H5File(FILE_NAME, H5F_ACC_RDWR);
     group = new Group(file->openGroup("Data"));
 
-    herr_t      status;
-    //status = H5Eset_auto(NULL, NULL);
-    status = H5Gget_objinfo(file->getId(), "/Data11", 0, NULL);
-    printf ("/Data11: ");
-    if (status == 0) printf ("The group exists.\n");
-    else printf ("The group either does NOT exist\n or some other error occurred.\n"); 
     /*
      * Access "Compressed_Data" dataset in the group.
      */
@@ -142,6 +156,23 @@ int main(void)
     cout << endl << "Iterating over elements in the file again" << endl;
     idx = H5Literate(file->getId(), H5_INDEX_NAME, H5_ITER_INC, NULL, file_info, NULL);
     cout << endl;
+
+    //import attributes
+    Attribute attr2 = group->openAttribute("bb");
+    int ddd[2][3];
+    attr2.read(PredType::NATIVE_INT, ddd);
+    cout << "bb: ";
+    for(int i=0; i<6; ++i)
+      cout << **ddd+i << " ";
+    cout << endl;
+    string strr;
+    attr_str = new Attribute(group->openAttribute("str"));
+    attr_str->read(*str_type, strr);
+    cout << strr << endl;
+    delete str_type;
+    str_type = NULL;
+     delete attr_str;
+    attr_str = NULL;
     /*
      * Close the group and file.
      */
