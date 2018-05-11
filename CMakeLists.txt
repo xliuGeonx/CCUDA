@@ -164,7 +164,7 @@ ENDIF(CCUDA_USE_HDF5)
 #-----------
 
 LIST (APPEND Tests_dir Culib SimpleKernel DeviceQ OpenGL_test0)
-LIST (APPEND HDF5_tests HDF5_create HDF5_read HDF5_write HDF5_extend HDF5_chunks HDF5_compound HDF5_group HDF5_attribute)
+LIST (APPEND HDF5_tests HDF5_create HDF5_read HDF5_write HDF5_extend HDF5_chunks HDF5_compound HDF5_group HDF5_attribute HDF5_iterate)
 LIST (APPEND Mp_dir MultiProcess MultiProcess_Sample MultiProcess_Asio)
 FOREACH (T_dir ${Tests_dir} ${Mp_dir} ${HDF5_tests})
 	ADD_SUBDIRECTORY( ${T_dir}) 
