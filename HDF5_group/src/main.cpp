@@ -72,6 +72,45 @@ int main(void)
     delete dataset;
     delete dataspace;
     delete group;
+
+    //-------------------------------------------------------
+    group = new Group( file->createGroup( "/Data22" ));
+    /*
+     * Create dataset "Compressed Data" in the group using absolute
+     * name. Dataset creation property list is modified to use
+     * GZIP compression with the compression effort set to 6.
+     * Note that compression can be used only when dataset is chunked.
+     */
+    dims[0] = 1000;
+    dims[1] = 20;
+    cdims[0] = 20;
+    cdims[1] = 20;
+    dataspace = new DataSpace(RANK, dims); // create new dspace
+    //DSetCreatPropList ds_creatplist;  // create dataset creation prop list
+    ds_creatplist.setChunk( 2, cdims );  // then modify it for compression
+    ds_creatplist.setDeflate( 6 );
+    /*
+     * Create the first dataset.
+     */
+   dataset = new DataSet(file->createDataSet(
+        "/Data22/Compressed_Data22", PredType::NATIVE_INT,
+        *dataspace, ds_creatplist ));
+    /*
+     * Close the first dataset.
+     */
+    delete dataset;
+    delete dataspace;
+    /*
+     * Create the second dataset.
+     */
+    dims[0] = 500;
+    dims[1] = 20;
+    dataspace = new DataSpace(RANK, dims); // create second dspace
+    dataset = new DataSet(file->createDataSet("/Data22/Float_Data22",
+            PredType::NATIVE_FLOAT, *dataspace));
+    delete dataset;
+    delete dataspace;
+    delete group;
     delete file;
     /*
      * Now reopen the file and group in the file.
@@ -81,10 +120,10 @@ int main(void)
 
     herr_t      status;
     //status = H5Eset_auto(NULL, NULL);
-    status = H5Gget_objinfo(file->getId(), "/Data11", 0, NULL);
-    printf ("/Data11: ");
-    if (status == 0) printf ("The group exists.\n");
-    else printf ("The group either does NOT exist\n or some other error occurred.\n"); 
+    //status = H5Gget_objinfo(file->getId(), "/Data11", 0, NULL);
+    //printf ("/Data11: ");
+    //if (status == 0) printf ("The group exists.\n");
+    //else printf ("The group either does NOT exist\n or some other error occurred.\n"); 
     /*
      * Access "Compressed_Data" dataset in the group.
      */
