@@ -2,6 +2,7 @@
 #ifdef HAVE_HDF5
 #include <boost/filesystem.hpp>
 #include <iostream>
+#include <streambuf>
 #include <string>
 #include "H5Cpp.h"
 using namespace H5;
@@ -118,12 +119,20 @@ int main(void)
     file = new H5File(FILE_NAME, H5F_ACC_RDWR);    
     group = new Group(file->openGroup("Data"));
 
-    herr_t      status;
-    //status = H5Eset_auto(NULL, NULL);
-    //status = H5Gget_objinfo(file->getId(), "/Data11", 0, NULL);
-    //printf ("/Data11: ");
-    //if (status == 0) printf ("The group exists.\n");
-    //else printf ("The group either does NOT exist\n or some other error occurred.\n"); 
+    {
+      streambuf* backup;
+      ofstream fout;
+      fout.open("ff.txt", fstream::out);
+      backup = cout.rdbuf();
+      cout.rdbuf(fout.rdbuf());
+      herr_t      status;
+      H5Eset_auto(NULL, NULL, NULL);
+      status = H5Gget_objinfo(file->getId(), "/Data11", 0, NULL);    
+      cout.rdbuf(backup);
+      printf ("/Data11: ");
+      if (status == 0) printf ("The group exists.\n");
+      else printf ("The group either does NOT exist or some other error occurred.\n"); 
+    }
     /*
      * Access "Compressed_Data" dataset in the group.
      */
